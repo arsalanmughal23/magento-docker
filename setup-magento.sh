@@ -5,6 +5,7 @@
 mkdir -p magento apache-config
 
 
+#region Dockerfile
 cat > Dockerfile << 'Dockerfile'
 FROM php:8.3-apache
 
@@ -60,8 +61,10 @@ RUN { \
 
 WORKDIR /var/www/html
 Dockerfile
+#endregion
 
 
+#region dockerComposeFile
 cat > docker-compose.yml << 'dockerComposeFile'
 services:
     web:
@@ -145,8 +148,253 @@ volumes:
     db_data:
     opensearch_data:
 dockerComposeFile
+#endregion
 
 
+#region .gitignore
+cat > .gitignore << 'gitignore'
+# Docker environment files to exclude
+docker-compose.yml.backup
+*.env
+.env.local
+.env.*.local
+
+# Magento directory specific ignores (for magento/ folder)
+/magento/app/code/
+/magento/app/design/
+/magento/app/etc/config.php
+/magento/app/etc/env.php
+/magento/app/etc/installation.txt
+/magento/generated/
+/magento/pub/static/
+/magento/pub/media/
+/magento/var/
+/magento/vendor/
+/magento/.git/
+/magento/.gitignore
+/magento/.gitattributes
+/magento/.github/
+/magento/.gitmodules
+
+# Magento 2 specific files
+/magento/.htaccess
+/magento/.htaccess.sample
+/magento/.user.ini
+/magento/.php-cs-fixer.dist.php
+/magento/auth.json
+/magento/auth.json.sample
+/magento/package.json
+/magento/package.json.sample
+/magento/Gruntfile.js
+/magento/Gruntfile.js.sample
+/magento/grunt-config.json
+/magento/grunt-config.json.sample
+/magento/composer.lock
+/magento/composer.phar
+
+# Logs and temporary files
+/magento/var/log/
+/magento/var/report/
+/magento/var/session/
+/magento/var/tmp/
+/magento/var/cache/
+/magento/var/page_cache/
+/magento/var/view_preprocessed/
+/magento/var/composer_home/
+/magento/var/export/
+/magento/var/import/
+/magento/var/import_history/
+/magento/var/backups/
+
+# Static content
+/magento/pub/static/_cache/
+/magento/pub/static/deployed_version.txt
+/magento/pub/static/.htaccess
+
+# Media files
+/magento/pub/media/catalog/
+/magento/pub/media/customer/
+/magento/pub/media/downloadable/
+/magento/pub/media/import/
+/magento/pub/media/theme/
+/magento/pub/media/tmp/
+/magento/pub/media/wysiwyg/
+/magento/pub/media/.htaccess
+
+# Generated code
+/magento/generated/code/
+/magento/generated/metadata/
+
+# Setup files
+/magento/setup/config/state.json
+/magento/update/CONFIG_STATUS.json
+
+# Node dependencies (if any)
+/magento/node_modules/
+/magento/package-lock.json
+/magento/yarn.lock
+
+# IDE and OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+*.tmp
+*.cache
+
+# Shell scripts and backups (except important ones)
+*.sh.backup
+*.sh~
+*.sh.old
+*.yml.backup
+*.yml~
+*.conf.backup
+setup-magento.sh.backup
+setup-magento.sh~
+
+# Test and coverage
+/magento/dev/tests/
+/magento/dev/tools/
+/magento/phpunit.xml
+/magento/phpunit.xml.dist
+.clover
+.coveralls.yml
+coverage/
+.coverage/
+.coverage.*
+phpunit.xml
+phpunit.xml.dist
+*.phar
+
+# Database local files
+*.sql
+*.sql.gz
+*.db
+*.sqlite
+
+# Certificate files
+*.pem
+*.crt
+*.key
+*.p12
+
+# Archive files
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Docker-specific excludes
+*.pid
+docker-compose.override.yml
+docker-compose.*.yml
+.docker/
+.dockerignore
+
+# Environment configuration
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# User-specific files
+*.user
+*.user.ini
+*.local
+
+# Backup and temporary files from editors
+*~
+*.bak
+*.orig
+*.old
+*.backup
+
+# Magento 2.4+ specific
+/magento/.gitlab-ci.yml
+/magento/.travis.yml
+/magento/.phpunit.result.cache
+
+# Security sensitive files
+/magento/app/etc/config.php.bak
+/magento/app/etc/env.php.bak
+/magento/auth.json.bak
+**/config.php.bak
+**/env.php.bak
+
+# MacOS specific
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+
+# Linux specific
+.directory
+*.part
+*.swp
+*.swo
+*~.nib
+.goutputstream-*
+.goutputstream-*.lock
+*.xpr
+*.pyc
+*.pyo
+.python_history
+.racket-options.rktd
+.session
+.urxvt
+.xsession-errors
+
+# Backup files from various tools
+composer.phar
+composer.lock (if you want to regenerate)
+gitignore
+#endregion
+
+
+#region .dockerignore
+cat > .dockerignore << 'dockerignore'
+# Docker ignore file
+.git
+.gitignore
+.gitattributes
+.github/
+*.md
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+.idea/
+.vscode/
+node_modules/
+vendor/
+magento/var/
+magento/vendor/
+magento/generated/
+magento/pub/static/
+magento/pub/media/
+magento/.git/
+*.sql
+*.sql.gz
+*.tar.gz
+*.zip
+docker-compose.override.yml
+*.env
+!.env.example
+dockerignore
+#endregion
+
+
+#region virtualHost
 mkdir -p apache-config && cat > apache-config/magento.conf << 'virtualHost'
 <VirtualHost *:80>
     ServerAdmin webmaster@localhost
@@ -162,6 +410,7 @@ mkdir -p apache-config && cat > apache-config/magento.conf << 'virtualHost'
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 virtualHost
+#endregion
 
 
 sudo chown -R $USER:$USER . && chmod -R 755 .

@@ -1,0 +1,81 @@
+services:
+    web:
+        build: .
+        container_name: magento_web
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./magento:/var/www/html
+            - ./apache-config:/etc/apache2/sites-available
+        environment:
+            - PHP_MEMORY_LIMIT=2G
+            - PHP_MAX_EXECUTION_TIME=1800
+            - PHP_POST_MAX_SIZE=2G
+            - PHP_UPLOAD_MAX_FILESIZE=2G
+        depends_on:
+            - db
+            - opensearch
+        networks:
+            - magento_network
+
+    db:
+        image: mysql:8.0
+        container_name: magento_db
+        ports:
+            - "3306:3306"
+        environment:
+            - MYSQL_ROOT_PASSWORD=root_password
+            - MYSQL_DATABASE=magento
+            - MYSQL_USER=magento
+            - MYSQL_PASSWORD=magento123
+        volumes:
+            - db_data:/var/lib/mysql
+        networks:
+            - magento_network
+        command: --max_allowed_packet=256M --log_bin_trust_function_creators=1
+
+    opensearch:
+        image: opensearchproject/opensearch:2.11.0
+        container_name: magento_opensearch
+        environment:
+            - discovery.type=single-node
+            - plugins.security.disabled=true
+            - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
+        ports:
+            - "9200:9200"
+            - "9600:9600"
+        volumes:
+            - opensearch_data:/usr/share/opensearch/data
+        networks:
+            - magento_network
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: magento_phpmyadmin
+        ports:
+            - "8080:80"
+        environment:
+            - PMA_HOST=db
+            - PMA_PORT=3306
+        depends_on:
+            - db
+        networks:
+            - magento_network
+
+    mailhog:
+        image: mailhog/mailhog
+        container_name: magento_mailhog
+        ports:
+            - "1025:1025"  # SMTP port
+            - "8025:8025"  # Web UI
+        networks:
+            - magento_network
+
+networks:
+    magento_network:
+        driver: bridge
+
+volumes:
+    db_data:
+    opensearch_data:
